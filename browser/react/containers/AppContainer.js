@@ -16,7 +16,12 @@ export default class AppContainer extends Component {
 
   constructor (props) {
     super(props);
-    this.state = initialState;
+
+    this.state = Object.assign({
+      currentSong: {},
+      currentSongList: [],
+      isPlaying: false
+    }, store.getState());
 
     this.toggle = this.toggle.bind(this);
     this.toggleOne = this.toggleOne.bind(this);

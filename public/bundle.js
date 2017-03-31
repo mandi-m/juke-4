@@ -26679,7 +26679,11 @@
 	
 	    var _this = _possibleConstructorReturn(this, (AppContainer.__proto__ || Object.getPrototypeOf(AppContainer)).call(this, props));
 	
-	    _this.state = _initialState2.default;
+	    _this.state = Object.assign({
+	      currentSong: {},
+	      currentSongList: [],
+	      isPlaying: false
+	    }, store.getState());
 	
 	    _this.toggle = _this.toggle.bind(_this);
 	    _this.toggleOne = _this.toggleOne.bind(_this);
@@ -29736,7 +29740,7 @@
 	    key: 'render',
 	    value: function render() {
 	      return _react2.default.createElement(_Lyrics2.default, {
-	        text: this.state.text,
+	        text: this.state.lyrics.text,
 	        setArtist: this.handleArtistInput,
 	        setSong: this.handleSongInput,
 	        artistQuery: this.state.artistQuery,
@@ -29845,7 +29849,30 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	// ******Lyrics******
 	var SET_LYRICS = exports.SET_LYRICS = 'SET_LYRICS';
+	
+	// Albums
+	var RECEIVE_ALBUMS = exports.RECEIVE_ALBUMS = 'RECEIVE_ALBUMS';
+	var RECEIVE_ALBUM = exports.RECEIVE_ALBUM = 'RECEIVE_ALBUM';
+	
+	// Artists
+	var RECEIVE_ARTISTS = exports.RECEIVE_ARTISTS = 'RECEIVE_ARTISTS';
+	var RECEIVE_ARTIST = exports.RECEIVE_ARTIST = 'RECEIVE_ARTIST';
+	
+	// Playlists
+	var RECEIVE_PLAYLISTS = exports.RECEIVE_PLAYLISTS = 'RECEIVE_PLAYLISTS';
+	var RECEIVE_PLAYLIST = exports.RECEIVE_PLAYLIST = 'RECEIVE_PLAYLIST';
+	
+	// Songs
+	var RECEIVE_SONGS = exports.RECEIVE_SONGS = 'RECEIVE_SONGS';
+	
+	// Player
+	var START_PLAYING = exports.START_PLAYING = 'START_PLAYING';
+	var STOP_PLAYING = exports.STOP_PLAYING = 'STOP_PLAYING';
+	var SET_CURRENT_SONG = exports.SET_CURRENT_SONG = 'SET_CURRENT_SONG';
+	var SET_LIST = exports.SET_LIST = 'SET_LIST';
+	var SET_PROGRESS = exports.SET_PROGRESS = 'SET_PROGRESS';
 
 /***/ },
 /* 280 */
@@ -29854,18 +29881,22 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _redux = __webpack_require__(281);
 	
-	var _rootReducer = __webpack_require__(302);
+	var _lyricsReducer = __webpack_require__(302);
 	
-	var _rootReducer2 = _interopRequireDefault(_rootReducer);
+	var _lyricsReducer2 = _interopRequireDefault(_lyricsReducer);
 	
-	var _reduxLogger = __webpack_require__(303);
+	var _playerReducer = __webpack_require__(303);
 	
-	var _reduxThunk = __webpack_require__(309);
+	var _playerReducer2 = _interopRequireDefault(_playerReducer);
+	
+	var _reduxLogger = __webpack_require__(304);
+	
+	var _reduxThunk = __webpack_require__(310);
 	
 	var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 	
@@ -29873,7 +29904,10 @@
 	
 	var logger = (0, _reduxLogger.createLogger)();
 	var composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || _redux.compose;
-	var store = (0, _redux.createStore)(_rootReducer2.default, composeEnhancers((0, _redux.applyMiddleware)(logger, _reduxThunk2.default)));
+	var store = (0, _redux.createStore)((0, _redux.combineReducers)({
+	  lyrics: _lyricsReducer2.default,
+	  player: _playerReducer2.default
+	}), composeEnhancers((0, _redux.applyMiddleware)(logger, _reduxThunk2.default)));
 	exports.default = store;
 
 /***/ },
@@ -30944,15 +30978,68 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.initialPlayerState = undefined;
+	
+	exports.default = function () {
+	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialPlayerState;
+	  var action = arguments[1];
+	
+	
+	  var newState = Object.assign({}, state);
+	
+	  switch (action.type) {
+	
+	    case _constants.SET_CURRENT_SONG:
+	      newState.currentSong = action.currentSong;
+	      break;
+	
+	    case _constants.SET_LIST:
+	      newState.currentSongList = action.currentSongList;
+	      break;
+	
+	    case _constants.START_PLAYING:
+	      newState.isPlaying = true;
+	      break;
+	
+	    case _constants.STOP_PLAYING:
+	      newState.isPlaying = false;
+	      break;
+	
+	    default:
+	      return state;
+	
+	  }
+	
+	  return newState;
+	};
+	
+	var _constants = __webpack_require__(279);
+	
+	var initialPlayerState = exports.initialPlayerState = {
+	  currentSong: {},
+	  currentSongList: [],
+	  isPlaying: false,
+	  progress: 0
+	};
+
+/***/ },
+/* 304 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
 	exports.logger = exports.createLogger = exports.defaults = undefined;
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var _core = __webpack_require__(304);
+	var _core = __webpack_require__(305);
 	
-	var _helpers = __webpack_require__(305);
+	var _helpers = __webpack_require__(306);
 	
-	var _defaults = __webpack_require__(308);
+	var _defaults = __webpack_require__(309);
 	
 	var _defaults2 = _interopRequireDefault(_defaults);
 	
@@ -31080,7 +31167,7 @@
 	exports.default = defaultLogger;
 
 /***/ },
-/* 304 */
+/* 305 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31093,9 +31180,9 @@
 	
 	exports.printBuffer = printBuffer;
 	
-	var _helpers = __webpack_require__(305);
+	var _helpers = __webpack_require__(306);
 	
-	var _diff = __webpack_require__(306);
+	var _diff = __webpack_require__(307);
 	
 	var _diff2 = _interopRequireDefault(_diff);
 	
@@ -31228,7 +31315,7 @@
 	}
 
 /***/ },
-/* 305 */
+/* 306 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -31252,7 +31339,7 @@
 	var timer = exports.timer = typeof performance !== "undefined" && performance !== null && typeof performance.now === "function" ? performance : Date;
 
 /***/ },
-/* 306 */
+/* 307 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31262,7 +31349,7 @@
 	});
 	exports.default = diffLogger;
 	
-	var _deepDiff = __webpack_require__(307);
+	var _deepDiff = __webpack_require__(308);
 	
 	var _deepDiff2 = _interopRequireDefault(_deepDiff);
 	
@@ -31351,7 +31438,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 307 */
+/* 308 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -31780,7 +31867,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 308 */
+/* 309 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -31831,7 +31918,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 309 */
+/* 310 */
 /***/ function(module, exports) {
 
 	'use strict';
